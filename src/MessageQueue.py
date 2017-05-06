@@ -6,8 +6,10 @@ import ast
 
 
 class MessageQueue():
+    
     REQUEST_QUEUE_URL = 'https://aitsgqueues.mrteera.com/messages/erp_request'
     RESPONSE_QUEUE_URL = 'https://aitsgqueues.mrteera.com/messages/erp_response'
+    DELETE_MSG_URL = 'https://aitsgqueues.mrteera.com/messages/erp_request/{}'
 
     def get_message(self):
         resp = requests.get(self.REQUEST_QUEUE_URL, verify=False)
@@ -25,6 +27,7 @@ class MessageQueue():
     # Sends authentication response to queue
     # message should be dict type
     # It should contain the keys: username, success, device-token
+    # TODO delete message from the queue once reply is sent
     def send_response(self, message, message_id):
         if message == None:
             return None
@@ -38,5 +41,5 @@ class MessageQueue():
         resp = requests.post(self.RESPONSE_QUEUE_URL, payload, verify=False)
         print("erp_response status code: " + str(resp.status_code))
         # if resp.status_code == 200:
-        #     resp = requests.delete('https://aitsgqueues.mrteera.com/messages/erp_request/{}'.format(message_id))
+        #     resp = requests.delete(DELETE_MSG_URL.format(message_id))
         #     print('delete message status: ' + str(resp.status_code))
