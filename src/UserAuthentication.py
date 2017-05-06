@@ -1,16 +1,15 @@
 import xmlrpclib
+import config
 
 class UserAuthentication:
     __authenticated = False
 
-    __url = 'http://localhost:8069'
-    __db = 'odoo'
-    __username = 'api@subigya.com'
-    __password = 'api@subigya.com'
+    __url = config.ODOO_URL
+    __db = config.ODOO_DB
 
     def __init__(self, name, identification):
-        self.name = name
-        self.identification = identification
+        self.username = name
+        self.password = identification
 
     def setUrl(self, url):
         self.__url = url
@@ -18,15 +17,13 @@ class UserAuthentication:
     def setUrl(self, db):
         self.__db = db
 
-    def setUsername(self, username):
-        self.__username = username
 
-    def setPassword(self, password):
-        self.__password = password
-
-    def connect(self):
+    def authenticate(self):
         common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(self.__url))
-        self.uid = common.authenticate(self.__db, self.__username, self.__password, {})
+        print self.username
+        print self.password
+        self.uid = common.authenticate(self.__db, self.username, self.password, {})
+        return self.uid
 
     def authenticateUser(self):
         self.connect()
@@ -38,5 +35,4 @@ class UserAuthentication:
             self.__authenticated = False
         elif(count == 1):
             self.__authenticated = True
-
         return self.__authenticated
