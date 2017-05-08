@@ -1,5 +1,6 @@
 import xmlrpclib
 import config
+import logging
 
 
 class UserAuthentication:
@@ -9,6 +10,7 @@ class UserAuthentication:
     __db = config.ODOO_DB
     __admin_user = config.ODOO_ADMIN
     __admin_pw = config.ODOO_ADMIN_PW
+    logging.getLogger(__name__)
 
     def __init__(self, name, identification):
         self.username = name
@@ -22,9 +24,9 @@ class UserAuthentication:
 
     def authenticate(self):
         common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(self.__url))
-        print "Authenticating user: %s" % self.username
+        logging.debug("Authenticating user: %s" % self.username)
         uid = common.authenticate(self.__db, self.username, self.password, {})
-        print uid
+        logging.debug("Got uid for %s: %s" % (self.username, uid))
         return uid
 
     def __connect(self):
