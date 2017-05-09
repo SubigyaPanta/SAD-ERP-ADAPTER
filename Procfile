@@ -1,1 +1,1 @@
-web: python authenticator.py
+web: python ../src/authenticator.py
