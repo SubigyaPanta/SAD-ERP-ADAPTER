@@ -3,7 +3,7 @@ import config
 import logging
 
 
-class UserAuthentication:
+class OdooConnector:
 
     __authenticated = False
     __url = config.ODOO_URL
@@ -12,9 +12,8 @@ class UserAuthentication:
     __admin_pw = config.ODOO_ADMIN_PW
     logging.getLogger(__name__)
 
-    def __init__(self, name, identification):
-        self.username = name
-        self.password = identification
+    def __init__(self):
+        pass
 
     def set_url(self, url):
         self.__url = url
@@ -22,31 +21,17 @@ class UserAuthentication:
     def set_db(self, db):
         self.__db = db
 
-    def authenticate(self):
+    def authenticate(self, username, password):
         common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(self.__url))
-        logging.debug("Authenticating user: %s" % self.username)
-        uid = common.authenticate(self.__db, self.username, self.password, {})
-        logging.debug("Got uid for %s: %s" % (self.username, uid))
+        logging.debug("Authenticating user: %s" % username)
+        uid = common.authenticate(self.__db, username, password, {})
+        logging.debug("Got uid for %s: %s" % (username, uid))
         return uid
 
     def __connect(self):
         common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(self.__url))
-        self.username = self.__admin_user
-        self.password = self.__admin_pw
-        self.uid = self.authenticate()
+        self.uid = self.authenticate(self.__admin_user, self.__admin_pw)
         return self.uid
-
-    def authenticate_user(self):
-        self.__connect()
-        models = xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(self.__url))
-        count = models.execute_kw(self.__db, self.uid, self.__password,
-                          'hr.employee', 'search_count',
-                                  [[['name_related', '=', self.name], ['identification_id', '=', self.identification]]])
-        if count == 0:
-            self.__authenticated = False
-        elif count == 1:
-            self.__authenticated = True
-        return self.__authenticated
 
     def get_user_role(self, user_id):
         if user_id is False:
@@ -72,6 +57,21 @@ class UserAuthentication:
         else:
             role = 'None'
         return role
+
+    def write_current_incident(self, user_id, incident_count):
+        logging.info('Writing incident_count %s for user %s' % (incident_count, user_id))
+        uid = self.__connect()
+        models = xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(self.__url))
+        user = models.execute_kw(self.__db, uid, self.__admin_pw,
+                          'res.users', 'read',
+                          [user_id], {'fields': ['employee_ids']})
+        employee_id = user[0]['employee_ids'][0]
+        models.execute_kw(self.__db, uid, self.__admin_pw, 'hr.employee', 'write', [[employee_id], {
+            'x_incidents': incident_count
+        }])
+
+
+
 
 # a = UserAuthentication('bla@mycompany.com', 'secret123')
 # uid = a.authenticate()

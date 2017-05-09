@@ -1,5 +1,5 @@
 from MessageQueue import MessageQueue
-from UserAuthentication import UserAuthentication
+from OdooConnector import OdooConnector
 from time import sleep
 import logging
 
@@ -11,8 +11,8 @@ while True:
         if auth_details is not None and id is not None:
             username = auth_details['username']
             password = auth_details['password']
-            auth = UserAuthentication(username, password)
-            is_authenticated = auth.authenticate()
+            auth = OdooConnector()
+            is_authenticated = auth.authenticate(username, password)
             logging.debug("Authentication result for %s: %s" % (username, is_authenticated))
             if is_authenticated is False:
                 success = 'false'
