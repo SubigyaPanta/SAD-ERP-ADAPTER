@@ -73,8 +73,7 @@ class UserAuthentication:
             role = 'None'
         return role
 
-
-a = UserAuthentication('bla@mycompany.com', 'secret123')
-uid = a.authenticate()
-groups = a.get_user_role(uid)
-print groups
+# a = UserAuthentication('bla@mycompany.com', 'secret123')
+# uid = a.authenticate()
+# groups = a.get_user_role(uid)
+# print groups

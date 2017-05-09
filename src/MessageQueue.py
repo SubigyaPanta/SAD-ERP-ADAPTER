@@ -23,8 +23,17 @@ class MessageQueue():
         else:
             logging.info('Found a message in the queue: ' + str(message_from_req['id']))
             message_id = message_from_req['id']
-            auth_details = ast.literal_eval(message_from_req['message'])
-            return auth_details, message_id
+            is_valid_msg = self.__check_format(message_from_req)
+            if is_valid_msg:
+                auth_details = ast.literal_eval(message_from_req['message'])
+                return auth_details, message_id
+            else:
+                logging.error("Message [%s] has a bad format" % message_from_req)
+                logging.info("Deleting message %s" % message_id)
+                resp = requests.delete(self.__DELETE_MSG_URL.format(message_id), verify=False)
+                logging.debug('Delete message status: ' + str(resp.status_code))
+                return None, None
+
 
     # Sends authentication response to queue
     # message should be dict type
@@ -46,3 +55,14 @@ class MessageQueue():
             resp = requests.delete(self.__DELETE_MSG_URL.format(message_id), verify=False)
             logging.debug('delete message status: ' + str(resp.status_code))
 
+    # Checks for the validity of the message format in the request queue
+    def __check_format(self, message):
+        message_id = message['id']
+        try:
+            auth_details = ast.literal_eval(message['message'])
+            username = auth_details['username']
+            password = auth_details['password']
+            device_token = auth_details['device-token']
+            return True
+        except Exception:
+            return False
