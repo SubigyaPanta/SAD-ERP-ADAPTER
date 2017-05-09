@@ -9,6 +9,7 @@ while True:
         queue = MessageQueue()
         auth_details, id = queue.get_message()
         if auth_details is not None and id is not None:
+            print "We got a message" + str(auth_details)
             username = auth_details['username']
             password = auth_details['password']
             auth = OdooConnector()
