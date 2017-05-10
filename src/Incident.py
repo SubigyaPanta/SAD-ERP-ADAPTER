@@ -1,4 +1,3 @@
-from OdooConnector import OdooConnector
 import config
 import requests
 import datetime
