@@ -15,8 +15,8 @@ if __name__ == '__main__':
     auth = OdooConnector()
     for username in incident_counts.keys():
         user_id = auth.find_user(username)
-        if user_id is not False:
-            auth.write_current_incident(user_id, incident_counts[username])
+        if len(user_id) is not 0:
+            auth.write_current_incident(user_id[0], incident_counts[username])
         else:
             logging.warn('No user with username[%s] in the system' % username)
 
