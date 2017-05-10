@@ -1,6 +1,7 @@
 from MessageQueue import MessageQueue
 from OdooConnector import OdooConnector
 from time import sleep
+from requests.exceptions import ConnectionError
 import logging
 
 if __name__ == '__main__':
@@ -24,6 +25,8 @@ if __name__ == '__main__':
                 response = {'username': username, 'success': success, 'role': role, 'device-token': auth_details['device-token']}
                 logging.debug("Response for %s: %s" % (username, response))
                 queue.send_response(response, id)
-        except Exception:
-            logging.error('The message in the queue is not in proper format')
+        except ConnectionError as connection_error:
+            logging.error('There is something wrong with the connection: [%s]' % connection_error)
+        except Exception as exception:
+            logging.error('Something went wrong [%s]' % exception)
         sleep(5)

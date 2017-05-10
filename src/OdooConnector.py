@@ -58,6 +58,15 @@ class OdooConnector:
             role = 'None'
         return role
 
+    # Finds the user with the given username in Odoo
+    def find_user(self, username):
+        uid = self.__connect()
+        models = xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(self.__url))
+        user_id = models.execute_kw(self.__db, uid, self.__admin_pw, 'res.users', 'search',
+                                    [[['login', '=', username]]])
+        return user_id
+
+    # Writes completed incident's count to employees in Odoo
     def write_current_incident(self, user_id, incident_count):
         logging.info('Writing incident_count %s for user %s' % (incident_count, user_id))
         uid = self.__connect()
