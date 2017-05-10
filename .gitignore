@@ -1,3 +1,5 @@
 .idea
 test.py
 config.py
+config.pyc
+incident.log
