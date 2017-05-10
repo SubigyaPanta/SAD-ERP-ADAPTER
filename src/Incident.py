@@ -17,14 +17,17 @@ class Incident:
         response = res.json()
         incident_counts = {}
         for incident in response:
-            assignee = incident['assignee']
-            username = assignee['username']
-            updated_at_str = incident['updatedAt'].split("T")[0]
-            updated_at = datetime.datetime.strptime(updated_at_str, "%Y-%m-%d").date()
-            if start_date < updated_at < end_date:
-                if incident_counts.has_key(username):
-                    incident_counts[username] = incident_counts[username] + 1
-                else:
-                    incident_counts[username] = 1
+            try:
+                assignee = incident['assignee']
+                username = assignee['username']
+                updated_at_str = incident['updatedAt'].split("T")[0]
+                updated_at = datetime.datetime.strptime(updated_at_str, "%Y-%m-%d").date()
+                if start_date < updated_at < end_date:
+                    if incident_counts.has_key(username):
+                        incident_counts[username] = incident_counts[username] + 1
+                    else:
+                        incident_counts[username] = 1
+            except Exception as e:
+                logging.error("Improper object format [%s]" % incident)
         logging.debug("Incident counts for date %s : %s" % (start_date, incident_counts))
         return incident_counts
